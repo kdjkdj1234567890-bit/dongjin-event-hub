@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이벤트·공모전·체험단 허브</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131a2a;
+      --card2: #192236;
+      --border: #25304a;
+      --text: #eef2ff;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 48px;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+    }
+    h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+    h1 span { color: var(--accent2); }
+    .meta { font-size: 0.8rem; color: var(--muted); }
+    .kpis {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;
+    }
+    @media (max-width: 600px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+    .kpi {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px;
+    }
+    .kpi .label { font-size: 0.75rem; color: var(--muted); }
+    .kpi .val { font-size: 1.35rem; font-weight: 800; margin-top: 2px; }
+    .checker {
+      background: linear-gradient(145deg, #151e33, #111827);
+      border: 1px solid #334155; border-radius: 16px; padding: 14px; margin-bottom: 18px;
+    }
+    .checker h2 { font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .checker textarea {
+      width: 100%; min-height: 64px; background: #0b101d; color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: 10px;
+      font-size: 0.85rem; resize: vertical; outline: none;
+    }
+    .checker textarea:focus { border-color: var(--accent2); }
+    .checker-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+    button {
+      border: none; border-radius: 10px; padding: 8px 14px; font-weight: 700;
+      font-size: 0.85rem; cursor: pointer; transition: 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-ghost { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+    .check-results { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .res-row {
+      padding: 8px 10px; border-radius: 10px; font-size: 0.82rem;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .res-ok { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+    .res-dup { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; }
+    .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+    .tab {
+      background: var(--card); color: var(--muted); border: 1px solid var(--border);
+      padding: 7px 13px; border-radius: 999px; font-size: 0.82rem; white-space: nowrap;
+    }
+    .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .search {
+      flex: 1; min-width: 180px; background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 0.85rem; outline: none;
+    }
+    .chip {
+      background: var(--card); color: var(--muted); border: 1px solid var(--border);
+      padding: 6px 11px; border-radius: 8px; font-size: 0.78rem;
+    }
+    .chip.active { background: var(--card2); color: var(--accent2); border-color: var(--accent2); }
+    .list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .item-title { font-weight: 700; font-size: 0.95rem; color: #f8fafc; }
+    .badges { display: flex; gap: 5px; flex-wrap: wrap; }
+    .badge {
+      font-size: 0.72rem; padding: 2px 7px; border-radius: 6px; font-weight: 700; white-space: nowrap;
+    }
+    .b-cat { background: #1e293b; color: #cbd5e1; }
+    .b-done { background: rgba(16,185,129,0.16); color: #34d399; }
+    .b-win { background: rgba(245,158,11,0.22); color: #fbbf24; }
+    .b-wait { background: rgba(34,211,238,0.16); color: #22d3ee; }
+    .b-skip { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .item-meta { font-size: 0.8rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+    .item-actions { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+    a.link-btn {
+      display: inline-block; text-decoration: none; background: var(--card2); color: var(--accent2);
+      border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+    }
+    .more-btn { width: 100%; margin-top: 14px; padding: 11px; background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>⚡ <span>이벤트</span> · 공모전 · 체험단 허브</h1>
+        <div class="meta" id="updatedMeta">데이터 불러오는 중...</div>
+      </div>
+    </header>
+
+    <div class="kpis">
+      <div class="kpi"><div class="label">전체 기록</div><div class="val" id="kpiTotal">-</div></div>
+      <div class="kpi"><div class="label">응모 완료</div><div class="val" style="color:var(--green)" id="kpiDone">-</div></div>
+      <div class="kpi"><div class="label">대기 / 후보</div><div class="val" style="color:var(--accent2)" id="kpiWait">-</div></div>
+      <div class="kpi"><div class="label">당첨 / 선정</div><div class="val" style="color:var(--amber)" id="kpiWin">-</div></div>
+    </div>
+
+    <section class="checker">
+      <h2>🔍 0.01초 중복 체커 (여러 줄 붙여넣기 가능)</h2>
+      <textarea id="urlInput" placeholder="인스타·유튜브·구글폼·네이버폼 링크나 제목 키워드를 한 줄에 하나씩 붙여 넣으세요..."></textarea>
+      <div class="checker-actions">
+        <button class="btn-primary" onclick="runDupCheck()">중복 확인</button>
+        <button class="btn-ghost" onclick="document.getElementById('urlInput').value='';document.getElementById('checkResults').innerHTML='';">지우기</button>
+        <span class="meta">고유 ID(`p/..`, `v=..`, 폼 ID)로 자동 매칭</span>
+      </div>
+      <div class="check-results" id="checkResults"></div>
+    </section>
+
+    <section class="controls">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="wait">🎯 대기 / 후보</button>
+        <button class="tab" data-tab="high">💎 고액 10만+</button>
+        <button class="tab" data-tab="win">🏆 당첨 / 선정</button>
+        <button class="tab" data-tab="all">📋 전체</button>
+      </div>
+      <div class="filters">
+        <input class="search" id="searchInput" placeholder="이벤트명, 경품, 번호(#) 검색..." oninput="resetAndRender()" />
+        <button class="chip active" data-cat="전체">전체</button>
+        <button class="chip" data-cat="공모전">공모전</button>
+        <button class="chip" data-cat="체험단">체험단</button>
+        <button class="chip" data-cat="이벤트">이벤트</button>
+      </div>
+    </section>
+
+    <div class="list" id="list"></div>
+    <button class="more-btn" id="moreBtn" style="display:none" onclick="showMore()">더 보기</button>
+  </div>
+
+  <script>
+    let ALL_ITEMS = [];
+    let ID_MAP = new Map();
+    let activeTab = 'wait';
+    let activeCat = '전체';
+    let pageLimit = 40;
+    const localDone = JSON.parse(localStorage.getItem('dj_local_done') || '{}');
+
+    function extractIdsFromText(text) {
+      const ids = [];
+      let m = text.match(/instagram\.com\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
+      if (m) ids.push('ig:' + m[1]);
+      m = text.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{6,})/);
+      if (m) ids.push('yt:' + m[1]);
+      m = text.match(/(naver\.me\/[A-Za-z0-9]+|forms\.gle\/[A-Za-z0-9]+|docs\.google\.com\/forms\/d\/e\/[A-Za-z0-9_-]+)/);
+      if (m) ids.push('form:' + m[1]);
+      const base = text.replace(/\?.*$/, '').replace(/\/$/, '').toLowerCase();
+      if (base.startsWith('http') && base.length > 12) ids.push('url:' + base);
+      return ids;
+    }
+
+    async function init() {
+      const res = await fetch('./data/ledger.json?t=' + Date.now());
+      const data = await res.json();
+      ALL_ITEMS = data.items || [];
+      document.getElementById('updatedMeta').textContent = `기준일: ${data.updated} · 총 ${ALL_ITEMS.length.toLocaleString()}건`;
+      document.getElementById('kpiTotal').textContent = ALL_ITEMS.length.toLocaleString();
+      document.getElementById('kpiDone').textContent = ALL_ITEMS.filter(x => x.s === '응모완료').length.toLocaleString();
+      document.getElementById('kpiWait').textContent = ALL_ITEMS.filter(x => x.s === '대기').length.toLocaleString();
+      document.getElementById('kpiWin').textContent = ALL_ITEMS.filter(x => x.s === '당첨').length.toLocaleString();
+
+      ALL_ITEMS.forEach(item => {
+        (item.ids || []).forEach(id => {
+          if (!ID_MAP.has(id)) ID_MAP.set(id, item);
+        });
+      });
+      render();
+    }
+
+    function normTitle(s) {
+      return String(s || '').toLowerCase().replace(/[\[\]()【】\s·\-_,./!?~'"]/g, '');
+    }
+
+    function runDupCheck() {
+      const lines = document.getElementById('urlInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const box = document.getElementById('checkResults');
+      box.innerHTML = '';
+      lines.forEach(line => {
+        const ids = extractIdsFromText(line);
+        let hit = null;
+        let matchType = 'URL ID';
+        for (const id of ids) {
+          if (ID_MAP.has(id)) { hit = ID_MAP.get(id); break; }
+        }
+        if (!hit && line.length >= 3) {
+          const low = normTitle(line);
+          if (low.length >= 3) {
+            hit = ALL_ITEMS.find(x => {
+              const xt = normTitle(x.t);
+              return xt && (xt.includes(low) || low.includes(xt));
+            });
+            if (hit) matchType = '제목 유사';
+          }
+        }
+        const div = document.createElement('div');
+        div.className = 'res-row ' + (hit ? 'res-dup' : 'res-ok');
+        if (hit) {
+          div.innerHTML = `<span>⛔ <b>중복(${matchType})</b> · #${hit.n || '-'} [${hit.s}] ${escapeHtml(hit.t)}</span><span style="opacity:.8">${escapeHtml(line.slice(0,40))}</span>`;
+        } else {
+          div.innerHTML = `<span>✅ <b>신규</b> · 응모 기록 없음</span><span>${escapeHtml(line.slice(0,60))}</span>`;
+        }
+        box.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function toggleLocalDone(n) {
+      if (!n) return;
+      localDone[n] = !localDone[n];
+      localStorage.setItem('dj_local_done', JSON.stringify(localDone));
+      render();
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      return ALL_ITEMS.filter(x => {
+        if (activeTab === 'wait' && x.s !== '대기') return false;
+        if (activeTab === 'win' && x.s !== '당첨') return false;
+        if (activeTab === 'high' && (x.vn || 0) < 100000) return false;
+        if (activeCat !== '전체' && x.g !== activeCat) return false;
+        if (q) {
+          const hay = `${x.n} ${x.t} ${x.v} ${x.p} ${x.d}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function resetAndRender() { pageLimit = 40; render(); }
+    function showMore() { pageLimit += 40; render(); }
+
+    function render() {
+      const items = getFiltered();
+      const slice = items.slice(0, pageLimit);
+      const list = document.getElementById('list');
+      list.innerHTML = slice.map(x => {
+        const isChecked = localDone[x.n];
+        const statusClass = x.s === '당첨' ? 'b-win' : x.s === '응모완료' ? 'b-done' : x.s === '대기' ? 'b-wait' : 'b-skip';
+        return `
+          <div class="item" style="${isChecked ? 'opacity:0.55' : ''}">
+            <div class="item-top">
+              <div class="item-title">${x.n ? '#' + escapeHtml(x.n) + ' · ' : ''}${escapeHtml(x.t || '제목 없음')}</div>
+              <div class="badges">
+                <span class="badge b-cat">${escapeHtml(x.g)}</span>
+                <span class="badge ${statusClass}">${escapeHtml(x.st || x.s)}</span>
+              </div>
+            </div>
+            <div class="item-meta">
+              ${x.v && x.v !== '미상' ? `<span>💰 ${escapeHtml(x.v)}</span>` : ''}
+              ${x.d ? `<span>⏰ 마감 ${escapeHtml(x.d)}</span>` : ''}
+              ${x.a ? `<span>🗓 응모 ${escapeHtml(x.a)}</span>` : ''}
+              ${x.p && x.p !== '기타/미상' ? `<span>📱 ${escapeHtml(x.p)}</span>` : ''}
+            </div>
+            <div class="item-actions">
+              ${x.u ? `<a class="link-btn" href="${escapeHtml(x.u)}" target="_blank">🔗 바로가기</a>` : ''}
+              <button class="chip" onclick="toggleLocalDone('${escapeHtml(x.n)}')">${isChecked ? '↩️ 체크 해제' : '☑️ 내 화면 완료'}</button>
+            </div>
+          </div>
+        `;
+      }).join('') || '<div class="meta" style="padding:24px;text-align:center;">조건에 맞는 항목이 없습니다.</div>';
+
+      const moreBtn = document.getElementById('moreBtn');
+      moreBtn.style.display = items.length > pageLimit ? 'block' : 'none';
+      moreBtn.textContent = `더 보기 (${slice.length} / ${items.length.toLocaleString()})`;
+    }
+
+    document.getElementById('tabs').addEventListener('click', e => {
+      if (!e.target.classList.contains('tab')) return;
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      activeTab = e.target.dataset.tab;
+      resetAndRender();
+    });
+
+    document.querySelectorAll('.chip[data-cat]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chip[data-cat]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        resetAndRender();
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>
